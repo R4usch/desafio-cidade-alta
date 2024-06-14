@@ -15,7 +15,7 @@ export class Emblem {
   @Column()
   name: string;
 
-  @ApiProperty({ description: 'Caminho de imagem do emblema' }) 
+  @ApiProperty({ description: 'Caminho de imagem do emblema' })
   @Column()
   image: string;
 }

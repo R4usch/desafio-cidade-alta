@@ -6,6 +6,7 @@ import {
   UseGuards,
   BadRequestException,
   InternalServerErrorException,
+  Body,
 } from '@nestjs/common';
 import { EmblemsService } from './emblems.service';
 import { RequireLogin } from 'src/auth/decorators/requirelogin.decorator';
@@ -21,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { Emblem } from 'src/database/entity/emblem.entity';
 import { EmblemInventory } from 'src/database/entity/emblem-inventory.entity';
+import { EquipDTO } from './dto/equip.dto';
 
 @ApiTags('Emblemas')
 @ApiBearerAuth()
@@ -49,7 +51,7 @@ export class EmblemController {
   @ApiResponse({
     status: 200,
     description: 'A lista foi retornada com sucesso',
-    type:Emblem
+    type: Emblem,
   })
   @ApiResponse({
     status: 400,
@@ -74,7 +76,11 @@ export class EmblemController {
     description:
       'Retorna todo o inventário de emblemas do usuário responsável pelo **Bearer token** de login. Requer um login autenticado.',
   })
-  @ApiResponse({ status: 200, description: 'Retorna a lista de emblemas pertence ao usuário', type:EmblemInventory })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna a lista de emblemas pertence ao usuário',
+    type: EmblemInventory,
+  })
   @ApiResponse({ status: 401, description: 'Token inválido' })
   //#endregion
   @Get('inventory')
@@ -118,5 +124,30 @@ export class EmblemController {
       });
     }
     return { message: `Emblem redeemed` };
+  }
+
+  //#region Docs
+  @ApiOperation({
+    summary: 'Equipa um emblema',
+    description:
+      'Equipa um emblema do usuário responsável pelo **Bearer token** de login. Não permite equipar mais de 3 emblemas.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'EQUIPPED, UNEQUIPPED, ou CANT_EQUIPPED.',
+  })
+  @ApiResponse({ status: 400, description: 'Emblema não encontrado' })
+  @ApiResponse({ status: 401, description: 'Token inválido' })
+  //#endregion
+  @Post('equip')
+  @RequireLogin()
+  async equipEmblem(@GetUser() user: User, @Body() equipDTO: EquipDTO) {
+    const res = await this.emblemsService.equipEmblem(
+      user,
+      equipDTO.slug,
+      equipDTO.equip,
+    );
+
+    return { message: res.toString() };
   }
 }

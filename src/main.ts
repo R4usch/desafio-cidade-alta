@@ -10,7 +10,6 @@ async function bootstrap() {
     .setDescription('Documentação da API de emblemas do Cidade Alta')
     .setVersion('1.0')
     .addTag('Emblemas')
-    
     .addBearerAuth()
     .build();
 

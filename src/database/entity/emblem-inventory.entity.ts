@@ -11,11 +11,17 @@ export class EmblemInventory {
   @Column()
   emblem_id: number;
 
-  @ApiProperty({ description: 'Identificador do usuário a quem pertence o emblema' })
+  @ApiProperty({
+    description: 'Identificador do usuário a quem pertence o emblema',
+  })
   @Column()
   user_id: number;
 
   @ApiProperty({ description: 'Data de resgate do emblema' })
   @Column()
   redeem_at: Date;
+
+  @ApiProperty({ description: 'Emblema está equipado ou não' })
+  @Column()
+  equipped: number;
 }

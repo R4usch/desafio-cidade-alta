@@ -6,6 +6,7 @@ import { Emblem } from '../database/entity/emblem.entity';
 import { EmblemInventory } from 'src/database/entity/emblem-inventory.entity';
 
 import { User } from 'src/database/entity/users.entity';
+import { EquipResponse } from './enum/equip.enum';
 
 @Injectable()
 export class EmblemsService {
@@ -81,5 +82,30 @@ export class EmblemsService {
     } else {
       return false;
     }
+  }
+
+  async getUserEmblemsEquipped(user: User): Promise<EmblemInventory[]> {
+    return this.emblemsInventoryRepository.findBy({
+      user_id: user.id,
+      equipped: 1,
+    });
+  }
+
+  async equipEmblem(
+    user: User,
+    slug: string,
+    equip: boolean,
+  ): Promise<EquipResponse> {
+    const exists = await this.getEmblemInventoryBySlug(user, slug);
+
+    const inventory = await this.getUserEmblemsEquipped(user);
+
+    if (inventory.length >= 3 && equip) return EquipResponse.CantEquip;
+
+    await this.emblemsInventoryRepository.save({
+      id: exists.id,
+      equipped: equip ? 1 : 0,
+    });
+    return equip ? EquipResponse.Equipped : EquipResponse.Unequipped;
   }
 }
