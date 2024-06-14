@@ -23,6 +23,8 @@ import {
 import { Emblem } from 'src/database/entity/emblem.entity';
 import { EmblemInventory } from 'src/database/entity/emblem-inventory.entity';
 import { EquipDTO } from './dto/equip.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { NewEmblemDTO } from './dto/new.dto';
 
 @ApiTags('Emblemas')
 @ApiBearerAuth()
@@ -130,7 +132,7 @@ export class EmblemController {
   @ApiOperation({
     summary: 'Equipa um emblema',
     description:
-      'Equipa um emblema do usuário responsável pelo **Bearer token** de login. Não permite equipar mais de 3 emblemas.',
+      'Equipa um emblema do usuário responsável pelo **Bearer token** de login. Não permite equipar mais de 3 emblemas. Requer login autenticado',
   })
   @ApiResponse({
     status: 201,
@@ -149,5 +151,26 @@ export class EmblemController {
     );
 
     return { message: res.toString() };
+  }
+
+  //#region Docs
+  @ApiOperation({
+    summary: 'Cria ou atualiza um emblema existente',
+    description:
+      'Cria um novo emblema ou atualiza um emblema existente com base no ID. Requer permissões de admin e um login autenticado',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Emblema criado com sucesso',
+  })
+  @ApiResponse({ status: 401, description: 'Token inválido' })
+  @ApiResponse({ status: 500, description: 'Emblema de mesmo slug já existe' })
+  //#endregion
+  @Post('new')
+  @RequireLogin()
+  @Roles(['ADMIN'])
+  async createEmblem(@Body() emblemDTO : NewEmblemDTO){
+    await this.emblemsService.createEmblem(emblemDTO.id,emblemDTO.slug, emblemDTO.name, emblemDTO.image_path);
+    return { message : 'Emblem created'}
   }
 }

@@ -2,7 +2,7 @@ create database cidadealta;
 use cidadealta;
 create table emblems(id int not null, slug text, name text, image text);
 create table users(id int not null AUTO_INCREMENT, name text, token text, role text not null default ('DEFAULT'), PRIMARY KEY (id));
-create table emblems_inventory(id int not null auto_increment, emblem_id int not null, user_id int not null, redeem_at date not null, primary key (id) );
+create table emblems_inventory(id int not null auto_increment, emblem_id int not null, user_id int not null, redeem_at date not null, equipped BOOL default 0, primary key (id) );
 ALTER TABLE `emblems_inventory`
   CHANGE `redeem_at` `redeem_at` DATETIME DEFAULT CURRENT_TIMESTAMP ;
 

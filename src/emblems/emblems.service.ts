@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -72,7 +72,7 @@ export class EmblemsService {
     const already = await this.getEmblemInventoryBySlug(user, slug);
     const emblem = await this.getEmblemBySlug(slug);
 
-    if (already == null) {
+    if (already == null && emblem != null) {
       const newEmblem = this.emblemsInventoryRepository.create({
         emblem_id: emblem.id,
         user_id: user.id,
@@ -107,5 +107,21 @@ export class EmblemsService {
       equipped: equip ? 1 : 0,
     });
     return equip ? EquipResponse.Equipped : EquipResponse.Unequipped;
+  }
+
+  async createEmblem(id : number, slug : string, name : string, image : string){
+
+    let emblem = await this.getEmblemBySlug(slug)
+    console.log(emblem)
+    if(emblem != null) throw new InternalServerErrorException({message: "Emblem already exists"})
+
+    const newEmblem = this.emblemsRepository.create({
+      id,
+      slug,
+      name,
+      image,
+    });
+    console.log(newEmblem)
+    await this.emblemsRepository.save(newEmblem); 
   }
 }
