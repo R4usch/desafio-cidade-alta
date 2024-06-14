@@ -27,3 +27,4 @@ $ npm run start:prod
 /emblems/list
 /emblems/inventory
 /emblems/redeem
+/emblems/equip
